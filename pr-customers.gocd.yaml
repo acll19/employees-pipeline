@@ -42,6 +42,7 @@ pipelines:
                     job: compile_to_Ubejar
                     source: target/target/swarm-1.0-swarm.jar
                     destination: app/
+                    is_file: true
                 - exec:
                     command: sh
                     arguments:
@@ -70,6 +71,7 @@ pipelines:
                     job: compile_to_Ubejar
                     source: target/target/swarm-1.0-swarm.jar
                     destination: app_aws/
+                    is_file: true
                 - exec:
                     command: sh
                     arguments:
