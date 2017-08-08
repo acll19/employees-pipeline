@@ -47,7 +47,7 @@ pipelines:
                     command: sh
                     arguments:
                       - -c
-                      - sshpass -p root scp -P 32 -o "StrictHostKeyChecking no" app/swarm-1.0-swarm.jar root@10.71.20.190:/tmp/
+                      - copy_local.sh
       - Deploy_on_loc:
           jobs:
             deploy_on_loc:
@@ -56,12 +56,12 @@ pipelines:
                     command: sh
                     arguments:
                       - -c
-                      - sshpass -p root ssh -p 32 -o "StrictHostKeyChecking no" root@10.71.20.190 'kill $(pgrep java) || true' &
+                      - stop_server_local.sh
                 - exec:
                     command: sh
                     arguments:
                       - -c
-                      - sshpass -p root ssh -p 32 -o "StrictHostKeyChecking no" root@10.71.20.190 ' java -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true -jar /tmp/swarm-1.0-swarm.jar  > /dev/null 2>&1 &'
+                      - deploy_local.sh
       - Deploy_on_aws:
           jobs:
             deploy:
