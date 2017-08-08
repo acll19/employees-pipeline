@@ -47,7 +47,7 @@ pipelines:
                     command: sh
                     arguments:
                       - -c
-                      - copy_local.sh
+                      - /godata/copy_local.sh
       - Deploy_on_loc:
           jobs:
             deploy_on_loc:
@@ -56,12 +56,12 @@ pipelines:
                     command: sh
                     arguments:
                       - -c
-                      - stop_server_local.sh
+                      - /godata/stop_server_local.sh
                 - exec:
                     command: sh
                     arguments:
                       - -c
-                      - deploy_local.sh
+                      - /godata/deploy_local.sh
       - Deploy_on_aws:
           jobs:
             deploy:
