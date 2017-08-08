@@ -31,6 +31,7 @@ pipelines:
                     arguments:
                       - '-Dmaven.test.skip=true'
                       - clean
+                      - package
                       - wildfly-swarm:package
       - Upload_to_loc:
           jobs:
