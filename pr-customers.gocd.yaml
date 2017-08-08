@@ -76,7 +76,7 @@ pipelines:
                     command: sh
                     arguments:
                       - -c
-                      - scp -i /godata/ssh_access.pem -o "StrictHostKeyChecking no" app_aws/swarm-1.0-swarm.jar ubuntu@ec2-52-14-114-20.us-east-2.compute.amazonaws.com:/tmp/
+                      - scp -i /godata/ssh_access.pem -o "StrictHostKeyChecking no" app_aws/swarm-1.0-swarm.jar ubuntu@ec2-52-14-114-20.us-east-2.compute.amazonaws.com:/tmp/ > /dev/null 2>&1 &
                 - exec:
                     command: sh
                     arguments:
