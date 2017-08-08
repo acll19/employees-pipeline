@@ -1,0 +1,86 @@
+pipelines:
+  Customers:
+    group: apis
+    materials:
+      repo:
+        git: https://github.com/exarcol/payroll.git
+        branch: master
+    stages:
+      - Unit_Tests:
+          jobs:
+            run_tests:
+              tasks:
+                - exec:
+                    command: mvn
+                    arguments:
+                      - clean
+                      - test
+      - Create_Uberjar:
+          jobs:
+            compile_to_Ubejar:
+              artifacts:
+                - warfile:
+                    source: '**/swarm-1.0.war'
+                    destination: target/
+                - uberjar:
+                    source: '**/swarm-1.0-swarm.jar'
+                    destination: target/
+              tasks:
+                - exec:
+                    command: mvn
+                    arguments:
+                      - '-Dmaven.test.skip=true'
+                      - clean
+                      - wildfly-swarm:package
+      - Upload_to_loc:
+          jobs:
+            upload_to_loc:
+              tasks:
+                - fetch:
+                    stage: Create_Uberjar
+                    job: compile_to_Ubejar
+                    source: target/target/swarm-1.0-swarm.jar
+                    destination: app/
+                - exec:
+                    command: sh
+                    arguments:
+                      - -c
+                      - sshpass -p root scp -P 32 -o "StrictHostKeyChecking no" app/swarm-1.0-swarm.jar root@10.71.20.190:/tmp/
+      - Deploy_on_loc:
+          jobs:
+            deploy_on_loc:
+              tasks:
+                - exec:
+                    command: sh
+                    arguments:
+                      - -c
+                      - sshpass -p root ssh -p 32 -o "StrictHostKeyChecking no" root@10.71.20.190 'kill $(pgrep java) || true' &
+                - exec:
+                    command: sh
+                    arguments:
+                      - -c
+                      - sshpass -p root ssh -p 32 -o "StrictHostKeyChecking no" root@10.71.20.190 ' java -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true -jar /tmp/swarm-1.0-swarm.jar  > /dev/null 2>&1 &'
+      - Deploy_on_aws:
+          jobs:
+            deploy:
+              tasks:
+                - fetch:
+                    stage: Create_Uberjar
+                    job: compile_to_Ubejar
+                    source: target/target/swarm-1.0-swarm.jar
+                    destination: app_aws/
+                - exec:
+                    command: sh
+                    arguments:
+                      - -c
+                      - scp -i /godata/ssh_access.pem -o "StrictHostKeyChecking no" app_aws/swarm-1.0-swarm.jar ubuntu@ec2-52-14-114-20.us-east-2.compute.amazonaws.com:/tmp/
+                - exec:
+                    command: sh
+                    arguments:
+                      - -c
+                      - ssh -i /godata/ssh_access.pem -o "StrictHostKeyChecking no" ubuntu@ec2-52-14-114-20.us-east-2.compute.amazonaws.com 'kill $(pgrep java) || true'
+                - exec:
+                    command: sh
+                    arguments:
+                      - -c
+                      - ssh -i /godata/ssh_access.pem -o "StrictHostKeyChecking no" ubuntu@ec2-52-14-114-20.us-east-2.compute.amazonaws.com 'nohup  java -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true -jar  /tmp/swarm-1.0-swarm.jar > /dev/null 2>&1 &'
