@@ -1,5 +1,5 @@
 pipelines:
-  Customers:
+  Employees:
     group: apis
     materials:
       repo:
