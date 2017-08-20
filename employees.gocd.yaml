@@ -3,7 +3,7 @@ pipelines:
     group: apis
     materials:
       repo:
-        git: https://github.com/exarcol/payroll.git
+        git: https://github.com/exarcol/employees.git
         branch: master
     stages:
       - Unit_Tests:
@@ -20,10 +20,10 @@ pipelines:
             compile_to_Ubejar:
               artifacts:
                 - build:
-                    source: '**/swarm-1.0.war'
+                    source: '**/employees-1.0.war'
                     destination: target/
                 - build:
-                    source: '**/swarm-1.0-swarm.jar'
+                    source: '**/employees-1.0-swarm.jar'
                     destination: target/
               tasks:
                 - exec:
@@ -40,7 +40,7 @@ pipelines:
                 - fetch:
                     stage: Create_Uberjar
                     job: compile_to_Ubejar
-                    source: target/target/swarm-1.0-swarm.jar
+                    source: target/target/employees-1.0-swarm.jar
                     destination: app/
                     is_file: true
                 - exec:
@@ -69,14 +69,14 @@ pipelines:
                 - fetch:
                     stage: Create_Uberjar
                     job: compile_to_Ubejar
-                    source: target/target/swarm-1.0-swarm.jar
+                    source: target/target/employees-1.0-swarm.jar
                     destination: app_aws/
                     is_file: true
                 - exec:
                     command: sh
                     arguments:
                       - -c
-                      - scp -i /godata/ssh_access.pem -o "StrictHostKeyChecking no" app_aws/swarm-1.0-swarm.jar ubuntu@ec2-52-14-114-20.us-east-2.compute.amazonaws.com:/tmp/ > /dev/null 2>&1 &
+                      - scp -i /godata/ssh_access.pem -o "StrictHostKeyChecking no" app_aws/employees-1.0-swarm.jar ubuntu@ec2-52-14-114-20.us-east-2.compute.amazonaws.com:/tmp/ > /dev/null 2>&1 &
                 - exec:
                     command: sh
                     arguments:
@@ -86,4 +86,4 @@ pipelines:
                     command: sh
                     arguments:
                       - -c
-                      - ssh -i /godata/ssh_access.pem -o "StrictHostKeyChecking no" ubuntu@ec2-52-14-114-20.us-east-2.compute.amazonaws.com 'nohup  java -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true -jar  /tmp/swarm-1.0-swarm.jar > /dev/null 2>&1 &'
+                      - ssh -i /godata/ssh_access.pem -o "StrictHostKeyChecking no" ubuntu@ec2-52-14-114-20.us-east-2.compute.amazonaws.com 'nohup  java -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true -jar  /tmp/employees-1.0-swarm.jar > /dev/null 2>&1 &'
