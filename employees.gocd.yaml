@@ -6,15 +6,22 @@ pipelines:
         git: https://github.com/acll19/employees.git
         branch: master
     stages:
-      - Unit_Tests:
+      - Tests:
           jobs:
-            run_tests:
+            unit_tests:
               tasks:
                 - exec:
                     command: mvn
                     arguments:
                       - clean
                       - test
+            integration_tests:
+              tasks:
+                - exec:
+                    command: mvn
+                    arguments:
+                      - verify
+                      - '-P integration-test'
       - Create_Uberjar:
           jobs:
             compile_to_Ubejar:
